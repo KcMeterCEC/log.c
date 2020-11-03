@@ -12,17 +12,20 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <time.h>
+#include <stdint.h>
 
+#define LOG_USE_COLOR
 #define LOG_VERSION "0.1.0"
 
 typedef struct {
-  va_list ap;
-  const char *fmt;
-  const char *file;
-  struct tm *time;
-  void *udata;
-  int line;
-  int level;
+    va_list ap;
+    const char *fmt;
+    const char *file;
+    struct tm *time;
+    void *udata;
+    int line;
+    int level;
+    uint32_t limit;
 } log_Event;
 
 typedef void (*log_LogFn)(log_Event *ev);
@@ -37,13 +40,14 @@ enum { LOG_TRACE, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_FATAL };
 #define log_error(...) log_log(LOG_ERROR, __FILE__, __LINE__, __VA_ARGS__)
 #define log_fatal(...) log_log(LOG_FATAL, __FILE__, __LINE__, __VA_ARGS__)
 
-const char* log_level_string(int level);
-void log_set_lock(log_LockFn fn, void *udata);
-void log_set_level(int level);
-void log_set_quiet(bool enable);
-int log_add_callback(log_LogFn fn, void *udata, int level);
-int log_add_fp(FILE *fp, int level);
+extern void log_open(void);
+extern void log_close(void);
+extern void log_set_lock(log_LockFn fn, void *udata);
+extern void log_set_level(int level);
+extern void log_set_quiet(bool enable);
+extern int log_add_fp(const char *path, int level);
+extern void log_set_file_limit(uint32_t limit);
 
-void log_log(int level, const char *file, int line, const char *fmt, ...);
+extern void log_log(int level, const char *file, int line, const char *fmt, ...);
 
 #endif
