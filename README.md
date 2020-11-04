@@ -19,7 +19,7 @@ pthread_mutex_t     mutex_log;
 
 static void log_lock(bool lock, void *udata)
 {
-	pthread_mutex_t *mtx = (pthread_mutex_t *)udata;
+    pthread_mutex_t *mtx = (pthread_mutex_t *)udata;
 	if(lock)
     {
         pthread_mutex_lock(mtx);        
@@ -33,7 +33,7 @@ static void log_lock(bool lock, void *udata)
 int main(void)
 {
     log_open();
-	if(pthread_mutex_init(&mutex_log, NULL) != 0)
+    if(pthread_mutex_init(&mutex_log, NULL) != 0)
     {
         log_fatal("mutex init error!\n");
     }
@@ -46,14 +46,14 @@ int main(void)
 
     log_add_fp("./log_out", LOG_TRACE);
 
-	log_trace("This is a log");
-	log_debug("This is a log");
-	log_info("This is a log");
-	log_warn("This is a log");
-	log_error("This is a log");
-	log_fatal("This is a log");
+    log_trace("This is a log");
+    log_debug("This is a log");
+    log_info("This is a log");
+    log_warn("This is a log");
+    log_error("This is a log");
+    log_fatal("This is a log");
 
-	log_close();
+    log_close();
 
 	return 0;
 }
@@ -107,7 +107,7 @@ If the log will be written to from multiple threads a lock function can be set.
 The function is passed the boolean `true` if the lock should be acquired or
 `false` if the lock should be released and the given `udata` value.
 
-### log_set_file_limit(uint32_t limit)
+#### log_set_file_limit(uint32_t limit)
 Set the limit of log file size.
 
 The default value is 0,which means there isn't limit for log file.
