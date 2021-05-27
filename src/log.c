@@ -81,7 +81,6 @@ static void file_callback(log_Event *ev) {
 
     if((ev->limit) && (ftell(ev->udata) > ev->limit))
     {
-        printf("file size: %ld\n", ftell(ev->udata));
         rewind(ev->udata);
     }
 
@@ -92,7 +91,6 @@ static void file_callback(log_Event *ev) {
     vfprintf(ev->udata, ev->fmt, ev->ap);
     fprintf(ev->udata, "\n");
     fflush(ev->udata);
-    printf("tell2: %ld\n", ftell(ev->udata));
 }
 
 
@@ -156,8 +154,6 @@ int log_add_fp(const char *path, int level) {
     {
         fread(&off, sizeof(off), 1, fpos);
         fclose(fpos);
-
-        printf("get last off = %ld\n", off);
     }
 
     fseek(fp, off, SEEK_CUR);

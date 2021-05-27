@@ -13,16 +13,27 @@ function-like macros for logging:
 #include "log.h"
 
 #include <pthread.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <errno.h>
 
 
-pthread_mutex_t     mutex_log;
+static pthread_mutex_t     mutex_log;
 
 static void log_lock(bool lock, void *udata)
 {
-    pthread_mutex_t *mtx = (pthread_mutex_t *)udata;
+	pthread_mutex_t *mtx = (pthread_mutex_t *)udata;
 	if(lock)
     {
-        pthread_mutex_lock(mtx);        
+        int ret = pthread_mutex_lock(mtx);
+        if(ret == EOWNERDEAD)
+        {
+            if(pthread_mutex_consistent(mtx))
+            {
+                perror("pthread_mutex_consistent failed:");
+            }
+        }
     }
     else 
     {
@@ -33,7 +44,13 @@ static void log_lock(bool lock, void *udata)
 int main(void)
 {
     log_open();
-    if(pthread_mutex_init(&mutex_log, NULL) != 0)
+    
+    pthread_mutexattr_t attr;
+
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_setrobust(&attr, PTHREAD_MUTEX_ROBUST);
+
+	if(pthread_mutex_init(&mutex_log, &attr) != 0)
     {
         log_fatal("mutex init error!\n");
     }
@@ -46,14 +63,14 @@ int main(void)
 
     log_add_fp("./log_out", LOG_TRACE);
 
-    log_trace("This is a log");
-    log_debug("This is a log");
-    log_info("This is a log");
-    log_warn("This is a log");
-    log_error("This is a log");
-    log_fatal("This is a log");
+	log_trace("This is a log");
+	log_debug("This is a log");
+	log_info("This is a log");
+	log_warn("This is a log");
+	log_error("This is a log");
+	log_fatal("This is a log");
 
-    log_close();
+	log_close();
 
 	return 0;
 }
